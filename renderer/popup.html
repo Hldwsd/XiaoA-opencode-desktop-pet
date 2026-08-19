@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; style-src 'self' 'unsafe-inline';">
+  <title>XiaoA 进度</title>
+  <style>
+:root {
+      --bg-alpha: 1;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background: transparent;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      border-radius: 16px;
+      background: linear-gradient(150deg, rgba(24,26,34,var(--bg-alpha)), rgba(15,16,22,var(--bg-alpha)));
+      border: 1px solid rgba(255,255,255,.10);
+      color: #e5e7eb;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      overflow: hidden;
+      transition: opacity .16s ease;
+    }
+    .head { display: flex; align-items: center; gap: 8px; min-height: 18px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #9ca3af; flex: none; }
+    .dot.working  { background: #34d399; box-shadow: 0 0 8px #34d399; }
+    .dot.thinking { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+    .dot.error    { background: #f87171; box-shadow: 0 0 8px #f87171; }
+    .dot.done     { background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
+    .title {
+      flex: 1;
+      font-size: 13px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .status {
+      flex: none;
+      font-size: 11px; padding: 2px 8px; border-radius: 99px;
+      background: rgba(255,255,255,.08);
+    }
+    .status.working  { color: #34d399; }
+    .status.thinking { color: #fbbf24; }
+    .status.error    { color: #f87171; }
+    .status.done     { color: #60a5fa; }
+    .status.idle     { color: #9ca3af; }
+    .cmd {
+      font-family: Consolas, "Cascadia Code", monospace;
+      font-size: 11px; line-height: 1.5;
+      background: rgba(255,255,255,.05);
+      border-radius: 8px; padding: 8px 10px;
+      max-height: 54px; overflow: auto;
+      color: #c4b5fd;
+      white-space: pre-wrap; word-break: break-all;
+      cursor: pointer;
+    }
+    .cmd::before { content: "$ "; color: #34d399; }
+    .cmd.error-line { color: #fca5a5; }
+    .body {
+      flex: 1; min-height: 0;
+      font-size: 11.5px; line-height: 1.6; color: #d1d5db;
+      overflow: auto;
+      max-height: 72px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+
+    /* 底部进度栏：整体右对齐，进度条出现时向左扩展填满 */
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: auto;
+      min-width: 0;
+      flex-wrap: nowrap;
+      justify-content: flex-end; /* 整体右对齐 */
+    }
+    /* 进度条区域：order=1 在左侧，flex:1 填满剩余空间，隐藏时不占空间 */
+    .meta-progress {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      order: 1;
+      flex: 1 1 0%;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .meta-progress.hidden { display: none; }
+    .bar {
+      flex: 1 1 0%;
+      height: 5px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      min-width: 0;
+    }
+    .bar > i {
+      display: block;
+      height: 100%;
+      width: 100%;
+      transform-origin: left center;
+      transform: scaleX(0);
+      background: linear-gradient(90deg, #34d399, #60a5fa);
+      border-radius: 99px;
+      transition: transform .35s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    .pct {
+      flex: 0 0 auto;
+      min-width: 36px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #34d399;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    /* 右侧固定区块：步骤/工具数 + 模型名，order=2 始终在最右 */
+    .meta-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      order: 2;
+      flex: 0 0 auto;
+    }
+    .meta-steps {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      color: #9ca3af;
+      min-width: 0;
+    }
+    .meta-model {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #d1d5db;
+      min-width: 0;
+    }
+
+    /* 响应式隐藏：宽度不足时按优先级隐藏 */
+    /* 1. 先隐藏模型名 */
+    @container card (max-width: 360px) {
+      .meta-model { display: none; }
+    }
+    /* 2. 再隐藏进度条（保留百分比） */
+    @container card (max-width: 300px) {
+      .bar { display: none; }
+    }
+    /* 3. 最后隐藏百分比 */
+    @container card (max-width: 240px) {
+      .pct { display: none; }
+    }
+    /* 步骤永不隐藏 */
+
+    .session-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: #9ca3af;
+    }
+    .session-row label { flex: none; white-space: nowrap; }
+    .dd { position: relative; flex: 1; min-width: 0; }
+    .dd-toggle {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: #d1d5db;
+      cursor: pointer;
+    }
+    .dd-toggle > span:first-child {
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dd-arrow { flex: none; font-size: 9px; color: #6b7280; transition: transform .15s; }
+    .dd.open .dd-arrow { transform: rotate(180deg); }
+    .dd-list {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      z-index: 20;
+      list-style: none; margin: 0; padding: 4px;
+      background: linear-gradient(150deg, rgba(24,26,34,.98), rgba(15,16,22,.99));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 10px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.45);
+      max-height: 150px; overflow-y: auto;
+      display: none;
+    }
+    .dd.open .dd-list { display: block; }
+    .dd-opt {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 8px; border-radius: 10px;
+      font-size: 11px; color: #d1d5db;
+      cursor: pointer;
+    }
+    .dd-opt:hover { background: rgba(255,255,255,.10); }
+    .dd-opt-label {
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dd-del {
+      flex: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(248,113,113,.15);
+      color: #f87171;
+      font-size: 10px;
+      visibility: hidden;
+      display: flex;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .dd-opt:hover .dd-del { visibility: visible; }
+    .dd-del:hover { background: rgba(248,113,113,.4); }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="head">
+      <div class="dot" id="dot"></div>
+      <div class="title" id="title">正在连接 OpenCode…</div>
+      <div class="status" id="status">…</div>
+    </div>
+    <div class="session-row">
+      <label>任务</label>
+      <div class="dd" id="dd">
+        <div class="dd-toggle" id="ddToggle">
+          <span id="ddLabel">⚡ 自动跟随最新任务</span>
+          <span class="dd-arrow">▾</span>
+        </div>
+        <ul class="dd-list" id="ddList">
+          <li class="dd-opt" data-id="latest">
+            <span class="dd-opt-label">⚡ 自动跟随最新任务</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="cmd" id="cmd" title="点击复制">暂无执行中的命令</div>
+    <div class="body" id="body"></div>
+    <div class="meta" id="meta" style="container-type: inline-size;">
+      <div class="meta-progress" id="metaProgress">
+        <div class="bar" id="bar"><i id="barfill"></i></div>
+        <span class="pct" id="pct"></span>
+      </div>
+      <div class="meta-right">
+        <span class="meta-steps" id="toolcount"></span>
+        <span class="meta-model" id="model"></span>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

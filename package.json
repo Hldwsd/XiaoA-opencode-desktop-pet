@@ -1,0 +1,47 @@
+{
+  "name": "opencode-desktop-pet",
+  "productName": "XiaoA",
+  "version": "1.0.0",
+  "description": "桌面桌宠：上传矢量图作为桌宠，实时显示 OpenCode 项目进度",
+  "main": "main.js",
+  "author": "XiaoA",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "set SMOKE_TEST=1&& electron .",
+    "dist": "electron-builder --win"
+  },
+  "license": "MIT",
+  "build": {
+    "appId": "com.xiaoa.desktop",
+    "productName": "XiaoA",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.js",
+      "progress-worker.js",
+      "preload.js",
+      "package.json",
+      "renderer/**/*",
+      "assets/**/*",
+      "pets/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "XiaoA"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^26.15.3",
+    "electron-packager": "^17.1.2"
+  }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>创建桌宠</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #16181f;
+      color: #e5e7eb;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .wrap { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+    h1 { font-size: 15px; font-weight: 600; }
+    .field label { display: block; font-size: 12px; color: #9ca3af; margin-bottom: 6px; }
+    .field input[type=text] {
+      width: 100%;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+    }
+    .field input[type=text]:focus { border-color: #3b82f6; }
+    .pick-row { display: flex; align-items: center; gap: 10px; }
+    .pick-row + .pick-row { margin-top: 8px; }
+    .pick-row .tag { width: 42px; flex: none; font-size: 12px; color: #d1d5db; }
+    .pick-row button {
+      flex: none;
+      background: rgba(59,130,246,.18);
+      border: 1px solid rgba(59,130,246,.4);
+      color: #93c5fd;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+    .pick-row button:hover { background: rgba(59,130,246,.32); }
+    .pick-row .file {
+      flex: 1; min-width: 0;
+      font-size: 11px; color: #6b7280;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pick-row .file.ok { color: #34d399; }
+    .err { min-height: 16px; font-size: 11.5px; color: #f87171; }
+    .actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .actions button {
+      border-radius: 8px;
+      padding: 7px 18px;
+      font-size: 12.5px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    #btnCancel { background: rgba(255,255,255,.08); color: #d1d5db; }
+    #btnCancel:hover { background: rgba(255,255,255,.16); }
+    #btnCreate { background: #3b82f6; color: #fff; }
+    #btnCreate:hover { background: #2563eb; }
+    .tip { font-size: 11px; color: #6b7280; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>创建桌宠</h1>
+    <div class="field">
+      <label>桌宠名称</label>
+      <input type="text" id="name" maxlength="40" placeholder="例如：小A">
+    </div>
+    <div class="field">
+      <label>三个状态的图片（SVG/PNG）</label>
+      <div class="pick-row">
+        <span class="tag">工作</span>
+        <button data-key="working" data-title="选择“工作”状态图片">选择图片</button>
+        <span class="file" data-out="working">未选择</span>
+      </div>
+      <div class="pick-row">
+        <span class="tag">思考</span>
+        <button data-key="thinking" data-title="选择“思考”状态图片">选择图片</button>
+        <span class="file" data-out="thinking">未选择</span>
+      </div>
+      <div class="pick-row">
+        <span class="tag">空闲</span>
+        <button data-key="idle" data-title="选择“空闲”状态图片">选择图片</button>
+        <span class="file" data-out="idle">未选择</span>
+      </div>
+    </div>
+    <div class="err" id="err"></div>
+    <div class="actions">
+      <button id="btnCancel">取消</button>
+      <button id="btnCreate">创建</button>
+    </div>
+    <div class="tip">创建后自动切换为该桌宠。每张图片会随任务状态自动切换：工作中/思考中/空闲。</div>
+  </div>
+  <script src="create.js"></script>
+</body>
+</html>

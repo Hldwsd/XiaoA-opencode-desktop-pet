@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="body" cx="40%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </radialGradient>
+  </defs>
+  <g>
+    <!-- 左耳 -->
+    <path d="M128 168 L96 52 L222 112 Z" fill="#f59e0b" stroke="#d97706" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M136 156 L118 84 L206 126 Z" fill="#fcd34d"/>
+    <!-- 右耳 -->
+    <path d="M384 168 L416 52 L290 112 Z" fill="#f59e0b" stroke="#d97706" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M376 156 L394 84 L306 126 Z" fill="#fcd34d"/>
+    <!-- 身体 -->
+    <ellipse cx="256" cy="310" rx="176" ry="168" fill="url(#body)" stroke="#d97706" stroke-width="10"/>
+    <!-- 眼睛 -->
+    <ellipse cx="192" cy="286" rx="26" ry="34" fill="#1f2937"/>
+    <ellipse cx="320" cy="286" rx="26" ry="34" fill="#1f2937"/>
+    <ellipse cx="202" cy="278" rx="9" ry="12" fill="#ffffff" opacity="0.9"/>
+    <ellipse cx="330" cy="278" rx="9" ry="12" fill="#ffffff" opacity="0.9"/>
+    <!-- 腮红 -->
+    <ellipse cx="140" cy="330" rx="26" ry="16" fill="#f87171" opacity="0.55"/>
+    <ellipse cx="372" cy="330" rx="26" ry="16" fill="#f87171" opacity="0.55"/>
+    <!-- 鼻子 -->
+    <ellipse cx="256" cy="332" rx="14" ry="11" fill="#b45309"/>
+    <!-- 嘴 -->
+    <path d="M256 344 Q256 372 228 372 Q214 372 210 356" fill="none" stroke="#92400e" stroke-width="8" stroke-linecap="round"/>
+    <path d="M256 344 Q256 372 284 372 Q298 372 302 356" fill="none" stroke="#92400e" stroke-width="8" stroke-linecap="round"/>
+    <!-- 胡须 -->
+    <g stroke="#92400e" stroke-width="7" stroke-linecap="round" opacity="0.7">
+      <line x1="118" y1="318" x2="66" y2="308"/>
+      <line x1="118" y1="344" x2="60" y2="348"/>
+      <line x1="394" y1="318" x2="446" y2="308"/>
+      <line x1="394" y1="344" x2="452" y2="348"/>
+    </g>
+    <!-- 尾巴 -->
+    <path d="M410 400 Q486 420 470 340 Q462 300 432 300" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+  </g>
+</svg>
