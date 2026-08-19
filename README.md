@@ -1,5 +1,7 @@
 # XiaoA — OpenCode 桌面桌宠
 
+> ⚠️ **平台支持**：目前仅支持 **Windows** 系统（Windows 10 / 11，x64）。
+
 桌面桌宠，实时显示 [OpenCode](https://opencode.ai) 的项目进度，并能在需要权限时弹出窗口一键允许 / 拒绝。
 
 ![XiaoA](assets/icon.png)
@@ -15,6 +17,14 @@
 - **高度定制**：桌宠与弹窗尺寸（40% ~ 250%）、弹窗透明度、置顶开关、进度弹窗显隐
 - **系统托盘 + 右键菜单**：托盘右键与桌宠右键均弹出完整菜单
 - **双击桌宠**：快速切换进度弹窗显隐
+
+## 💻 系统要求
+
+- **操作系统**：仅支持 Windows 10 / 11（x64）
+- **OpenCode**：需安装 [OpenCode](https://opencode.ai) CLI（`npm i -g opencode-ai`），或在 PATH 中提供可用的 opencode 服务器
+- **依赖**：无需额外运行时，安装包已内置 Electron
+
+> 暂不支持 macOS / Linux。
 
 ## 📦 安装
 
